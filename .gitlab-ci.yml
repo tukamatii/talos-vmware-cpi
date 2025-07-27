@@ -1,0 +1,9 @@
+---
+
+stages:
+  - test
+  - deploy
+
+include:
+  - component: $CI_SERVER_FQDN/oit/open-repositories/ci-cd-catalog/config_file_validate@~latest
+  - component: $CI_SERVER_FQDN/oit/open-repositories/ci-cd-catalog/scan_secrets@~latest
