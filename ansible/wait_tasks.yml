@@ -5,7 +5,7 @@
     kind: DaemonSet
     name: vsphere-cloud-controller-manager
     namespace: kube-system
-    kubeconfig: "{{kube_config_file_no_loadbalancer}}"
+    kubeconfig: "{{kube_config_file}}"
   register: cpi_ds
   until: >
     cpi_ds.resources | length > 0 and
@@ -23,7 +23,7 @@
   kubernetes.core.k8s_info:
     api_version: v1
     kind: Node
-    kubeconfig: "{{ kube_config_file_no_loadbalancer }}"
+    kubeconfig: "{{ kube_config_file }}"
   register: nodes
   delegate_to: localhost
   run_once: true
@@ -36,6 +36,11 @@
       (nodes.resources | selectattr('spec.providerID', 'defined') | 
        selectattr('spec.providerID', 'match', '^vsphere://') | list | length) == (nodes.resources | length)
     }}"
+
+- name: Wait 5 more minutes
+  ansible.builtin.pause:
+    minutes: 5
+  when: talos_bootstrap.changed
 
 - name: Restart kubelet on VIP node (only if some node lacks vsphere providerID)
   ansible.builtin.shell:
@@ -55,7 +60,7 @@
   kubernetes.core.k8s_info:
     api_version: v1
     kind: Node
-    kubeconfig: "{{kube_config_file_no_loadbalancer}}"
+    kubeconfig: "{{kube_config_file}}"
   register: nodes
   until: >
     nodes.resources is defined and
