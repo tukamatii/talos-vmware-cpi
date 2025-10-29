@@ -19,6 +19,7 @@ metadata:
 stringData:
   {{vcenter_hostname}}.username: {{vcenter_cpi_user}}
   {{vcenter_hostname}}.password: {{ vcenter_cpi_password }}
+
 ---
 apiVersion: v1
 kind: ConfigMap
