@@ -28,34 +28,6 @@
   delegate_to: localhost
   run_once: true
 
-- name: Check if all nodes have a vsphere providerID
-  ansible.builtin.set_fact:
-    all_nodes_have_vsphere_provider: "{{ 
-      nodes.resources is defined and
-      nodes.resources | length > 0 and
-      (nodes.resources | selectattr('spec.providerID', 'defined') | 
-       selectattr('spec.providerID', 'match', '^vsphere://') | list | length) == (nodes.resources | length)
-    }}"
-
-- name: Wait 5 more minutes
-  ansible.builtin.pause:
-    minutes: 5
-  when: talos_bootstrap.changed
-
-- name: Restart kubelet on VIP node (only if some node lacks vsphere providerID)
-  ansible.builtin.shell:
-    cmd: "talosctl service kubelet restart -n {{ talos_interface_vip }} --talosconfig {{ talos_config_folder }}{{ target }}.yaml"
-  delegate_to: localhost
-  run_once: true
-  async: 120
-  poll: 0
-  when: not all_nodes_have_vsphere_provider
-
-- name: Wait one minute after kubelet restart
-  ansible.builtin.pause:
-    minutes: 1
-  when: not all_nodes_have_vsphere_provider
-
 - name: Wait for all nodes to have cloud provider initialized (no uninitialized taint)
   kubernetes.core.k8s_info:
     api_version: v1
