@@ -32,7 +32,7 @@ metadata:
 data:
   vsphere.conf: |
     global:
-      insecure: true
+      insecure: false
       disableIPMatchCheck: true
       secretName: vsphere-cloud-secret
       secretNamespace: kube-system
